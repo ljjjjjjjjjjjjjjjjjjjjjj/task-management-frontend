@@ -15,4 +15,7 @@ export interface TaskModel {
   assignedDate?: Date | null
   unassignedDate?: Date  | null
   doneDate?: Date | null
+
+  timeStart?: Date | null
+  timeEnd?: Date | null
 }

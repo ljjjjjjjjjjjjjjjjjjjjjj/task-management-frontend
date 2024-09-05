@@ -8,6 +8,10 @@ import { createTask, fetchTaskDetailedyId, updateTask } from '../../api/TasksApi
 import { createCategory, fetchCategories } from '../../api/CategoriesApi';
 import { fetchEmployeesWithImagesAll } from '../../api/EmployeesApi';
 import { CustomSelect } from '../../components/common/CustomSelect';
+import Datetime from 'react-datetime';
+import TimePicker from 'react-time-picker';
+import 'react-datetime/css/react-datetime.css';
+import 'react-time-picker/dist/TimePicker.css';
 import { format } from 'date-fns';
 
 import './TaskPageModal.scss'
@@ -38,8 +42,25 @@ export function TaskPageModal ({ task, onClose, onTaskUpdated }: TaskPageModalPr
   const [formTask, setFormTask] = useState<TaskDetailedModel>({ ...task });
   const [newAssignedToId, setNewAssignedToId] = useState<string>('');
 
+  const [timeEnd, setTimeEnd] = useState(
+    formTask.timeEnd ? new Date(formTask.timeEnd)
+    .toLocaleTimeString('en-GB').slice(0, 5) : ''
+  );
+
+  const [timeStart, setTimeStart] = useState(
+    formTask.timeStart ? new Date(formTask.timeStart)
+    .toLocaleTimeString('en-GB').slice(0, 5) : ''
+  );
+
   
   useEffect(() => {
+
+    console.log(formTask.timeStart);
+    console.log(formTask.title);
+    console.log(formTask.createdByEmployee.firstName);
+
+    console.log(formTask);
+
     const getCategories = async () => {
       const categoriesData = await fetchCategories();
       setCategories(categoriesData);
@@ -62,6 +83,82 @@ export function TaskPageModal ({ task, onClose, onTaskUpdated }: TaskPageModalPr
     getUserProjects();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+
+  const handleDateChange = (date: any, field: 'timeStart' | 'timeEnd') => {
+    if (date && typeof date !== 'string') {
+      const newDate = date.toDate();
+  
+      if (field === 'timeStart') {
+        if (formTask.timeEnd && newDate >= new Date(formTask.timeEnd)) {
+          alert('Start date must be earlier than the end date');
+          return;
+        }
+        setFormTask(prevState => ({
+          ...prevState,
+          timeStart: newDate,
+        }));
+      } else if (field === 'timeEnd') {
+        if (formTask.timeStart && newDate <= new Date(formTask.timeStart)) {
+          alert('End date must be after the start date');
+          return;
+        }
+        setFormTask(prevState => ({
+          ...prevState,
+          timeEnd: newDate,
+        }));
+      }
+    }
+  };
+
+
+  const handleTimeChange = (time: string | null, field: 'timeStart' | 'timeEnd') => {
+    if (time) {
+      const [hours, minutes] = time.split(':');
+
+      const newTime = new Date(formTask[field] || new Date()); 
+      newTime.setHours(parseInt(hours, 10));
+      newTime.setMinutes(parseInt(minutes, 10));
+  
+      if (field === 'timeStart') {
+        if (formTask.timeEnd && newTime >= new Date(formTask.timeEnd)) {
+          alert('Start time must be earlier than the end time');
+          return;  
+        }
+        setTimeStart(time);
+        setFormTask(prevState => ({
+          ...prevState,
+          timeStart: newTime,
+        }));
+      } 
+      else if (field === 'timeEnd') {
+        if (formTask.timeStart && newTime <= new Date(formTask.timeStart)) {
+          alert('End time must be after the start time');
+          return; 
+        }
+        setTimeEnd(time);
+        setFormTask(prevState => ({
+          ...prevState,
+          timeEnd: newTime,
+        })); 
+      }
+
+    } else {
+      
+      setFormTask(prevState => ({
+        ...prevState,
+        [field]: null,
+      }));
+  
+      
+      if (field === 'timeStart') {
+        setTimeStart('');
+      } else if (field === 'timeEnd') {
+        setTimeEnd('');
+      }
+    }
+  };
+
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -111,7 +208,10 @@ export function TaskPageModal ({ task, onClose, onTaskUpdated }: TaskPageModalPr
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    console.log(`handleSubmit - ${formTask.assignedToEmployee?.employeeId}`);
+    if (formTask.timeStart && formTask.timeEnd && new Date(formTask.timeStart) >= new Date(formTask.timeEnd)) {
+      alert('Start time must be earlier than the end time');
+      return; 
+    }
     
     try {
       const taskToSave: TaskModel = {
@@ -128,6 +228,8 @@ export function TaskPageModal ({ task, onClose, onTaskUpdated }: TaskPageModalPr
           assignedDate: formTask.assignedDate,
           unassignedDate: formTask.unassignedDate,
           doneDate: formTask.doneDate,
+          timeStart: formTask.timeStart,
+          timeEnd: formTask.timeEnd,
       };
 
       if (!formTask.taskId && state.user) {
@@ -250,6 +352,46 @@ export function TaskPageModal ({ task, onClose, onTaskUpdated }: TaskPageModalPr
             onChange={(value: string) => setFormTask(prevState => ({ ...prevState, priority: value }))}
           />
         </div>
+
+
+
+        <div className='task-form-item'>
+          <label htmlFor="timeStart">Start time:</label>
+          <Datetime 
+            value={formTask.timeStart ? new Date(formTask.timeStart) : undefined}
+            onChange={(date: any) => handleDateChange(date, 'timeStart')}
+            dateFormat="DD MMMM YYYY"
+            timeFormat={false}
+            closeOnSelect
+          />
+          <TimePicker
+            onChange={(time) => handleTimeChange(time, 'timeStart')}
+            value={timeStart}
+            disableClock={true}
+            format="HH:mm"
+          />
+        </div>
+
+        <div className='task-form-item'>
+ 
+          <label htmlFor="timeEnd">End time:</label>
+          <Datetime 
+            value={formTask.timeEnd ? new Date(formTask.timeEnd) : undefined}
+            onChange={(date: any) => handleDateChange(date, 'timeEnd')}
+            dateFormat="DD MMMM YYYY"
+            timeFormat={false}
+            closeOnSelect
+          />
+          <TimePicker
+            onChange={(time) => handleTimeChange(time, 'timeEnd')}
+            value={timeEnd}
+            disableClock={true}
+            format="HH:mm"
+          />
+
+        </div>
+
+        
 
 
         <div className='task-form-item'>

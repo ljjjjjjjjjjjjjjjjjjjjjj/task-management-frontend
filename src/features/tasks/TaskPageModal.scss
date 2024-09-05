@@ -13,6 +13,7 @@
 .modal-content {
   background-color: white;
   width: 45%;
+  min-width: 450px;
   height: 70%;
   padding: 20px;
   position: relative;
@@ -80,6 +81,7 @@
   border: 1px solid rgb(234, 232, 232);
 }
 
+
 .task-form-submit-buttons{
   display: flex;
   justify-content: center; /* Center horizontally */
@@ -111,6 +113,66 @@
     font-size: 1.1rem;
   }
 }
+
+
+/* Datetime element */
+.rdt {
+  display: inline-block; 
+  vertical-align: middle;
+  margin-right: 2px;
+  min-width: 160px;
+}
+
+.rdt input.form-control {
+  height: 2.2rem;
+  padding: 0 10px; 
+  border-radius: 6px; 
+  border: 1px solid rgb(234, 232, 232);
+}
+  
+
+/* TimePicker element */
+.react-time-picker__wrapper {
+  border: 1px solid rgb(234, 232, 232);
+  border-radius: 6px;
+  background-color: rgb(250, 251, 255);
+  padding: 0px;
+  padding-left: 5px;
+  margin-left: 2px;
+  margin-right: 20px;
+  height: 2.2rem;
+}
+
+.react-time-picker__inputGroup {
+  border: none;
+  outline: none;
+  background-color: transparent;
+}
+
+.react-time-picker__inputGroup__hour,
+.react-time-picker__inputGroup__minute {
+  border: none !important;
+  outline: none !important; 
+  background-color: transparent !important; 
+  box-shadow: none !important; 
+}
+
+.react-time-picker__clear-button {
+  border: none;
+  cursor: pointer;
+  margin: 0px;
+  padding: 0px;
+  width: 25px;
+}
+
+.react-time-picker__clear-button__icon{
+  margin: 0px;
+  padding: 0px;
+  width: 13px;
+  stroke: #212529;
+
+}
+
 
 
 

@@ -12,6 +12,8 @@ export const fetchAllTasks = async (): Promise<TaskModel[]> => {
     assignedDate: task.assignedDate ? new Date(task.assignedDate) : null,
     unassignedDate: task.unassignedDate ? new Date(task.unassignedDate) : null,
     doneDate: task.doneDate ? new Date(task.doneDate) : null,
+    timeStart: task.timeStart ? new Date(task.timeStart) : null,
+    timeEnd: task.timeEnd ? new Date(task.timeEnd) : null,
   }));
   return tasks;
 };
@@ -24,6 +26,8 @@ export const fetchTaskById = async (taskId : string): Promise<TaskModel> => {
     assignedDate: response.data.assignedDate ? new Date(response.data.assignedDate) : null,
     unassignedDate: response.data.unassignedDate ? new Date(response.data.unassignedDate) : null,
     doneDate: response.data.doneDate ? new Date(response.data.doneDate) : null,
+    timeStart: response.data.timeStart ? new Date(response.data.timeStart) : null,
+    timeEnd: response.data.timeEnd ? new Date(response.data.timeEnd) : null,
   };
   return task;
 };
@@ -36,6 +40,8 @@ export const fetchTaskDetailedyId = async (taskId : string): Promise<TaskDetaile
     assignedDate: response.data.assignedDate ? new Date(response.data.assignedDate) : null,
     unassignedDate: response.data.unassignedDate ? new Date(response.data.unassignedDate) : null,
     doneDate: response.data.doneDate ? new Date(response.data.doneDate) : null,
+    timeStart: response.data.timeStart ? new Date(response.data.timeStart) : null,
+    timeEnd: response.data.timeEnd ? new Date(response.data.timeEnd) : null,
   };
   return task;
 };
@@ -48,6 +54,8 @@ export const fetchTasksByEmployeeId = async (employeeId : string): Promise<TaskM
     assignedDate: task.assignedDate ? new Date(task.assignedDate) : null,
     unassignedDate: task.unassignedDate ? new Date(task.unassignedDate) : null,
     doneDate: task.doneDate ? new Date(task.doneDate) : null,
+    timeStart: task.timeStart ? new Date(task.timeStart) : null,
+    timeEnd: task.timeEnd ? new Date(task.timeEnd) : null,
   }));
   return tasks;
 };
@@ -60,6 +68,8 @@ export const fetchTasksDetailedByEmployeeId = async (employeeId : string): Promi
     assignedDate: task.assignedDate ? new Date(task.assignedDate) : null,
     unassignedDate: task.unassignedDate ? new Date(task.unassignedDate) : null,
     doneDate: task.doneDate ? new Date(task.doneDate) : null,
+    timeStart: task.timeStart ? new Date(task.timeStart) : null,
+    timeEnd: task.timeEnd ? new Date(task.timeEnd) : null,
   }));
   return tasks;
 };
@@ -72,6 +82,8 @@ export const fetchTasksDetailedByAssignedToId = async (employeeId : string): Pro
     assignedDate: task.assignedDate ? new Date(task.assignedDate) : null,
     unassignedDate: task.unassignedDate ? new Date(task.unassignedDate) : null,
     doneDate: task.doneDate ? new Date(task.doneDate) : null,
+    timeStart: task.timeStart ? new Date(task.timeStart) : null,
+    timeEnd: task.timeEnd ? new Date(task.timeEnd) : null,
   }));
   return tasks;
 };
@@ -84,6 +96,8 @@ export const fetchTasksDetailedByCreatedById = async (employeeId : string): Prom
     assignedDate: task.assignedDate ? new Date(task.assignedDate) : null,
     unassignedDate: task.unassignedDate ? new Date(task.unassignedDate) : null,
     doneDate: task.doneDate ? new Date(task.doneDate) : null,
+    timeStart: task.timeStart ? new Date(task.timeStart) : null,
+    timeEnd: task.timeEnd ? new Date(task.timeEnd) : null,
   }));
   return tasks;
 };
@@ -97,6 +111,8 @@ export const fetchTasksByProjectId = async (projectId : string): Promise<TaskMod
     assignedDate: task.assignedDate ? new Date(task.assignedDate) : null,
     unassignedDate: task.unassignedDate ? new Date(task.unassignedDate) : null,
     doneDate: task.doneDate ? new Date(task.doneDate) : null,
+    timeStart: task.timeStart ? new Date(task.timeStart) : null,
+    timeEnd: task.timeEnd ? new Date(task.timeEnd) : null,
   }));
   return tasks;
 };
@@ -109,6 +125,8 @@ export const fetchTasksDetailedByProjectId = async (projectId : string): Promise
     assignedDate: task.assignedDate ? new Date(task.assignedDate) : null,
     unassignedDate: task.unassignedDate ? new Date(task.unassignedDate) : null,
     doneDate: task.doneDate ? new Date(task.doneDate) : null,
+    timeStart: task.timeStart ? new Date(task.timeStart) : null,
+    timeEnd: task.timeEnd ? new Date(task.timeEnd) : null,
   }));
   return tasks;
 };
@@ -120,6 +138,8 @@ export const updateTask = async (task: TaskModel, taskId: string) => {
     assignedDate: task.assignedDate ? task.assignedDate.toISOString() : null,
     unassignedDate: task.unassignedDate ? task.unassignedDate.toISOString() : null,
     doneDate: task.doneDate ? task.doneDate.toISOString() : null,
+    timeStart: task.timeStart ? task.timeStart.toISOString() : null,
+    timeEnd: task.timeEnd ? task.timeEnd.toISOString() : null,
   };
   const response = await axios.put(`${baseUrl}/${taskId}`, taskForUpdate);
 
@@ -133,6 +153,8 @@ export const createTask = async (task: TaskModel): Promise<TaskModel> => {
     assignedDate: task.assignedDate ? task.assignedDate.toISOString() : null,
     unassignedDate: task.unassignedDate ? task.unassignedDate.toISOString() : null,
     doneDate: task.doneDate ? task.doneDate.toISOString() : null,
+    timeStart: task.timeStart ? task.timeStart.toISOString() : null,
+    timeEnd: task.timeEnd ? task.timeEnd.toISOString() : null,
   };
   const response = await axios.post(baseUrl, taskCreate);
 
