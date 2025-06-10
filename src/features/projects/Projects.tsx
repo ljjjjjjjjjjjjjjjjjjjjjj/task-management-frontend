@@ -64,10 +64,42 @@ export function Projects () {
   };
 
   const handleProjectUpdated = (updatedProject: ProjectDetailedModel) => {
-    setProjectList(prevProjects =>
-      prevProjects.map(project => (project.projectId === updatedProject.projectId ? updatedProject : project))
-    );
+    setProjectList(prevProjects => {
+    const exists = prevProjects.some(project => project.projectId === updatedProject.projectId);
+
+    if (exists) {
+      return prevProjects.map(project =>
+        project.projectId === updatedProject.projectId ? updatedProject : project
+      );
+    }
+    return [updatedProject, ...prevProjects];
+  });
   };
+
+  const createNewProject = () => {
+      const newProject : ProjectDetailedModel = {
+          projectId: '',
+          projectName: '',
+          teams: [],
+          participants: [],
+          createdByEmployee: {
+            employeeId: state.user?.employeeId || '',
+            firstName: state.user?.firstName || 'Unknown',
+            lastName: state.user?.lastName || 'User',
+            imageId: '',
+            imageData: ''
+          },
+          status: "",
+          progress: 0,
+          createdDate: new Date(),
+          startDate: new Date(),
+          initialDeadlineDate: new Date(),
+          endDate: new Date()
+      };
+
+      setSelectedProject(newProject);
+      setIsModalOpen(true);
+    };
 
     
   return (
@@ -86,7 +118,7 @@ export function Projects () {
         </div> 
 
         <div className='projects-header-subtitle'>
-          <button className='button-basic-gray'>Create new project</button>
+          <button className='button-basic-gray' onClick={createNewProject}>Create new project</button>
         </div>
 
         <div className='projects-header-subtitle'>

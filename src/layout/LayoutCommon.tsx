@@ -7,6 +7,7 @@ import './LayoutCommon.scss';
 import { useDispatch } from 'react-redux';
 import { AppRoutes } from '../routes/AppRoutes';
 import { resetCurrentPage, setCurrentPage } from '../store/currentPageSlice';
+import { Toast } from '../components/common/Toast';
 
 export function LayoutCommon () {
   const dispatch = useDispatch();
@@ -47,6 +48,8 @@ export function LayoutCommon () {
   
   return (
     <div className="layout-common">
+      <Toast />
+      
       <div className="header">
         <Header />
       </div>

@@ -80,9 +80,18 @@ export function Tasks () {
   };
 
   const handleTaskUpdated = (updatedTask: TaskDetailedModel) => {
-    setTaskList(prevTasks =>
-      prevTasks.map(task => (task.taskId === updatedTask.taskId ? updatedTask : task))
-    );
+    console.log("before setTaskList: ", taskList);
+    setTaskList(prevTasks => {
+    const exists = prevTasks.some(task => task.taskId === updatedTask.taskId);
+
+    if (exists) {
+      return prevTasks.map(task => 
+        task.taskId === updatedTask.taskId ? updatedTask : task
+      );
+    }
+
+    return [updatedTask, ...prevTasks];
+  });
   };
 
   const createNewTask = () => {
@@ -108,6 +117,14 @@ export function Tasks () {
     setSelectedTask(newTask);
     setIsModalOpen(true);
   };
+
+
+
+  // console logs:
+  useEffect(() => {
+    console.log("taskList", taskList)
+  },
+  [taskList])
 
     
   return (

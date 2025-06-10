@@ -14,10 +14,12 @@ import 'react-datetime/css/react-datetime.css';
 import 'react-time-picker/dist/TimePicker.css';
 import { format } from 'date-fns';
 
-import './TaskPageModal.scss'
 import { TaskModel } from '../../models/TaskModel';
 import { CustomDropdown } from '../../components/common/CustomDropdown';
 import { EmployeeNameAndImageModel } from '../../models/EmployeeNameAndImageModel';
+import { useDispatch } from 'react-redux';
+import { showToast } from '../../store/toastSlice';
+import './TaskPageModal.scss'
 
 interface TaskPageModalProps {
   task: TaskDetailedModel;
@@ -35,6 +37,7 @@ const priorityOptions = [
 
 export function TaskPageModal ({ task, onClose, onTaskUpdated }: TaskPageModalProps) {
   const { state } = useAuth();
+  const dispatch = useDispatch();
   
   const [categories, setCategories] = useState<CategoryModel[]>([]);
   const [employees, setEmployees] = useState<EmployeeNameAndImageModel[]>([]);
@@ -234,11 +237,23 @@ export function TaskPageModal ({ task, onClose, onTaskUpdated }: TaskPageModalPr
 
       if (!formTask.taskId && state.user) {
           const createdTask = await createTask(taskToSave);
-          const detailedTask = await fetchTaskDetailedyId(createdTask.taskId!);
+          if (!createdTask.taskId) {
+            throw new Error("Task ID missing after creation");
+          }
+          const detailedTask = await fetchTaskDetailedyId(createdTask.taskId);
           onTaskUpdated(detailedTask);
+          dispatch(showToast({
+            status: 'success',
+            message: 'Task created successfully',
+          }));
+
       } else {
           await updateTask(taskToSave, formTask.taskId!);
           onTaskUpdated(formTask);
+          dispatch(showToast({
+            status: 'success',
+            message: 'Task updated successfully',
+          }));
       }
 
       setNewAssignedToId('');
@@ -246,6 +261,10 @@ export function TaskPageModal ({ task, onClose, onTaskUpdated }: TaskPageModalPr
 
     } catch (error) {
       console.error('Failed to save task', error);
+      dispatch(showToast({
+        status: 'error',
+        message: 'Something went wrong. Task was not saved.',
+      }));
     }
   };
 

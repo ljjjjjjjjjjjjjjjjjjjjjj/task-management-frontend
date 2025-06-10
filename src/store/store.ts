@@ -1,9 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit';
 import currentPageReducer from './currentPageSlice';
+import toastReducer from './toastSlice'
 
 const store = configureStore({
   reducer: {
     currentPage: currentPageReducer,
+    toast: toastReducer
   }
 });
 

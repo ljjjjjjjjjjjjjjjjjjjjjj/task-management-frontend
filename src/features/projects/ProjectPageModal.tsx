@@ -1,18 +1,22 @@
 import { useEffect, useState } from 'react';
 import { ProjectDetailedModel } from '../../models/ProjectDetailedModel';
-import { updateProject } from '../../api/ProjectsApi';
+import { createProject, fetchDetailedProjectById, updateProject } from '../../api/ProjectsApi';
 import { fetchEmployeesWithImagesAll } from '../../api/EmployeesApi';
 import { format } from 'date-fns';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
-import './ProjectPageModal.scss'
 import { TeamNameModel } from '../../models/TeamNameModel';
 import { fetchAllTeamsNameDto } from '../../api/TeamsApi';
 import { EmployeeNameAndImageModel } from '../../models/EmployeeNameAndImageModel';
 import { CustomDropdown } from '../../components/common/CustomDropdown';
 import { EmployeeImageDisplay } from '../../components/common/EmployeeImageDisplay';
 import { ProjectModel } from '../../models/ProjectModel';
+import { useAuth } from '../../context/AuthContext';
+import { useDispatch } from 'react-redux';
+import { showToast } from '../../store/toastSlice';
+
+import './ProjectPageModal.scss'
 
 interface ProjectPageModalProps {
   project: ProjectDetailedModel;
@@ -21,6 +25,8 @@ interface ProjectPageModalProps {
 }
 
 export function ProjectPageModal ({ project, onClose, onProjectUpdated }: ProjectPageModalProps) {
+  const { state } = useAuth();
+  const dispatch = useDispatch();
   
   const [formProject, setFormProject] = useState<ProjectDetailedModel>({ ...project });
   const [employees, setEmployees] = useState<EmployeeNameAndImageModel[]>([]);
@@ -135,13 +141,38 @@ export function ProjectPageModal ({ project, onClose, onProjectUpdated }: Projec
       
       };
 
+      console.log("projectToBeUpdated", projectToBeUpdated);
 
 
-      await updateProject(projectToBeUpdated, formProject.projectId!);
-      onProjectUpdated(formProject);
+      if (!formProject.projectId && state.user) {
+          const createdProject = await createProject(projectToBeUpdated);
+          if (!createdProject.projectId) {
+            console.log("Project ID missing after creation");
+          } 
+          else {
+          const detailedProject = await fetchDetailedProjectById(createdProject.projectId); 
+          onProjectUpdated(detailedProject);
+          dispatch(showToast({
+            status: 'success',
+            message: 'Project created successfully',
+          }));
+          }
+      } else {
+          await updateProject(projectToBeUpdated, formProject.projectId!);
+          onProjectUpdated(formProject);
+          dispatch(showToast({
+            status: 'success',
+            message: 'Project updated successfully',
+          }));
+      }
+
       onClose();
     } catch (error) {
         console.error('Failed to update project', error);
+        dispatch(showToast({
+          status: 'error',
+          message: 'Failed to save project.',
+        }));
     }
   };
 
@@ -228,6 +259,53 @@ export function ProjectPageModal ({ project, onClose, onProjectUpdated }: Projec
             <option value="DONE">Done</option>
           </select>
         </div>
+
+
+
+        <div className='project-form-item'>
+          <label htmlFor="progress">Progress (%):</label>
+          <input
+            type="number"
+            min={0}
+            max={100}
+            value={formProject.progress}
+            onChange={handleChange}
+            style={{ width: '60px', marginLeft: '10px' }}
+          />
+        </div>
+        
+
+
+        <div className='project-form-item'>
+          <input
+            type="range"
+            id="progress"
+            name="progress"
+            min={0}
+            max={100}
+            value={formProject.progress}
+            onChange={handleChange}
+          />
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         {formProject.status.toLowerCase() === 'done' && (
           <div className='project-form-item'>
