@@ -6,7 +6,7 @@ import { EmployeeImageDisplay } from "./EmployeeImageDisplay";
 
 
 interface CustomDropdownProps {
-  labelTitle: string;
+  labelTitle?: string;
   employees: EmployeeNameAndImageModel[];
   setSelectedEmployeeId: (id: string) => void;
   handleEmployeeAction: (id: string) => void;
@@ -70,7 +70,7 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
 
   return (
     <div className="custom-dropdown" ref={dropdownRef}>
-      <label htmlFor="selectedEmployeeId">{labelTitle}</label>
+      {labelTitle && <label htmlFor="selectedEmployeeId">{labelTitle}</label>}
       <div className="dropdown-container">
         <input
           type="text"

@@ -196,7 +196,7 @@ export function ProjectPageModal ({ project, onClose, onProjectUpdated }: Projec
             required />
         </div>
 
-        <div className='project-form-item-with-new-line'>
+        <div className='project-form-item'>
           <h3>Project participants: </h3>
           <div className='new-line-list-items'>
             {formProject.participants.map(participant => (
@@ -208,18 +208,20 @@ export function ProjectPageModal ({ project, onClose, onProjectUpdated }: Projec
           </div>
         </div>
 
-        <CustomDropdown
-          labelTitle="Add participant: "
-          employees={employees}
-          setSelectedEmployeeId={setNewParticipantId}  
-          handleEmployeeAction={handleAddParticipant} 
-          placeholderText="Search new participant" 
-          resetTrigger={participantResetTrigger}
-        />
+        <div className="project-form-item">
+          <label htmlFor="selectedEmployeeId">Add participant:</label>
+          <CustomDropdown
+            employees={employees}
+            setSelectedEmployeeId={setNewParticipantId}
+            handleEmployeeAction={handleAddParticipant}
+            placeholderText="Search new participant"
+            resetTrigger={participantResetTrigger}
+          />
+        </div>
 
-        <div className='project-form-item-with-new-line'>
+        <div className='project-form-item'>
           <h3>Project teams: </h3>
-          <ul>
+          <ul className='team-list'>
             {formProject.teams.map(team => (
               <li key={team.teamId}>{team.teamName}</li>
             ))}
@@ -230,21 +232,26 @@ export function ProjectPageModal ({ project, onClose, onProjectUpdated }: Projec
           <label htmlFor="newTeamId">
             Add team:
           </label>
-          <select 
-            id="newTeamId" 
-            name="newTeamId" 
-            value={newTeamId}
-            onFocus={handleGetAllTeams}
-            onChange={(e) => setNewTeamId(e.target.value)}
-          >
-            <option value="">None</option>
-            {allTeams.map(team => (
-              <option key={team.teamId} value={team.teamId}>
-                {team.teamName}
-              </option>
-            ))}
-          </select>
-          <button type="button" className='confirm-button' onClick={handleAddTeam}>Add Team</button>
+          <div className='input-with-button'>
+            <select 
+              id="newTeamId" 
+              name="newTeamId" 
+              value={newTeamId}
+              onFocus={handleGetAllTeams}
+              onChange={(e) => setNewTeamId(e.target.value)}
+            >
+              <option value="">None</option>
+              {allTeams.map(team => (
+                <option key={team.teamId} value={team.teamId}>
+                  {team.teamName}
+                </option>
+              ))}
+            </select>
+        
+            <button type="button" className='confirm-button' onClick={handleAddTeam}>
+              Add
+            </button>
+          </div>
         </div>
 
 
@@ -270,13 +277,14 @@ export function ProjectPageModal ({ project, onClose, onProjectUpdated }: Projec
             max={100}
             value={formProject.progress}
             onChange={handleChange}
-            style={{ width: '60px', marginLeft: '10px' }}
+            style={{ width: '60px'}}
           />
         </div>
         
 
 
         <div className='project-form-item'>
+          <label htmlFor="progress"></label>
           <input
             type="range"
             id="progress"
@@ -289,22 +297,42 @@ export function ProjectPageModal ({ project, onClose, onProjectUpdated }: Projec
         </div>
 
 
+        {formProject.status.toLowerCase() !== 'not started' && (
+          <div className='project-form-item'>
+            <label htmlFor="startDate">Start date:</label>
+            <DatePicker
+              selected={formProject.startDate ? new Date(formProject.startDate) : null}
+              onChange={(date: Date | null) => {
+                setFormProject(prevState => ({
+                  ...prevState,
+                  startDate: date
+                }));
+              }}
+              showTimeSelect
+              dateFormat="dd MMMM yyyy, HH:mm"
+              timeFormat="HH:mm"
+              placeholderText="Select start date"
+              className="datepicker-input"
+            />
+          </div>
+        )}
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        {/* {formProject.status.toLowerCase() !== 'not_started' && (
+          <div className='project-form-item'>
+            <label htmlFor="startDate">
+              Start date:
+            </label>
+            <input 
+              type="text" 
+              id="startDate" 
+              value={formProject.startDate 
+                ? format(new Date(formProject.startDate), 'dd MMMM yyyy, HH:mm') 
+                : ''}
+              readOnly 
+            />
+          </div>
+        )} */}
 
 
         {formProject.status.toLowerCase() === 'done' && (
@@ -317,22 +345,6 @@ export function ProjectPageModal ({ project, onClose, onProjectUpdated }: Projec
               id="endDate" 
               value={formProject.endDate 
                 ? format(new Date(formProject.endDate), 'dd MMMM yyyy, HH:mm') 
-                : ''}
-              readOnly 
-            />
-          </div>
-        )}
-
-        {formProject.status.toLowerCase() !== 'not started' && (
-          <div className='project-form-item'>
-            <label htmlFor="startDate">
-              Start date:
-            </label>
-            <input 
-              type="text" 
-              id="startDate" 
-              value={formProject.startDate 
-                ? format(new Date(formProject.startDate), 'dd MMMM yyyy, HH:mm') 
                 : ''}
               readOnly 
             />

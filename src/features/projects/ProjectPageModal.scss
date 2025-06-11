@@ -12,13 +12,18 @@
 
 .modal-content {
   background-color: white;
-  width: 45%;
+  width: 55%;
+  min-width: 450px;
+  max-width: 800px;
   height: auto;
   min-height: 70%;
   padding: 20px;
   position: relative;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  overflow: visible; // visibility for the date picker pop-up
+  position: relative;
+  margin-bottom: 60px;
 }
 
 .close-button {
@@ -67,12 +72,66 @@
 }
 
 .project-form-item{
-  display: flex;
+  display: grid;
+  grid-template-columns: 30% 70%;
   align-items: top; /* Center vertically */
+  gap: 10px;
   width: 100%;
   margin-top: 10px;
   margin-bottom: 10px;
 
+  label {
+    font-weight: 600;
+    text-align: left;
+  }
+
+  input,
+  select,
+  textarea {
+    width: 100%;
+    padding: 6px 10px;
+    font-size: 1rem;
+    border-radius: 6px;
+    border: 1px solid #eaeaea;
+    background-color: rgb(250, 251, 255);
+  }
+
+}
+
+.team-list {
+  margin: 0;
+  padding: 0;
+
+  li {
+    list-style: none;
+    position: relative;
+    padding-left: 1.2rem;
+    font-size: 0.8rem;
+    line-height: 1.5rem;
+    color: gray;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0.4rem;
+      width: 0.7rem;
+      height: 0.7rem;
+      background-color: gray;
+      border-radius: 50%;
+    }
+  }
+}
+
+.project-form-section {
+  margin: 20px 0;
+  padding: 12px;
+  background-color: #f9f9f9;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
 }
 
 .project-form-item-with-new-line{
@@ -113,7 +172,6 @@
   label{
     font-weight: 600;
   }
-
 }
 
 .project-form-item label {
@@ -145,7 +203,37 @@
   }
 }
 
+.input-with-button {
+  display: flex;
+  flex-direction: column;
 
+  select {
+    all: unset;
+    margin-bottom: 8px;
+    height: 36px;
+    box-sizing: border-box;
+    padding: 6px 10px;
+
+    font-size: 1rem;
+    border-radius: 6px;
+    border: 1px solid #eaeaea;
+    background-color: rgb(250, 251, 255);
+    margin: 0;
+  }
+
+  .confirm-button {
+    align-self: flex-start;
+    width: 60px;
+    padding: 6px 12px;
+    font-size: 0.9rem;
+    background-color: rgb(38, 131, 213);
+  }
+
+  button:hover {
+    background-color: rgb(36, 119, 192);
+    font-size: 1rem;
+  }
+}
 
 .project-form-submit-buttons{
   display: flex;
@@ -184,5 +272,8 @@
   display: block;
 }
 
+.react-datepicker-popper {
+  z-index: 9999;
+}
 
 
