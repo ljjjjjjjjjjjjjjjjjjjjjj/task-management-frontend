@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { fetchUserProjectsByStatus } from '../../api/ProjectsApi';
+import { fetchUserDetailedProjects, fetchUserProjectsByStatus } from '../../api/ProjectsApi';
 import { useAuth } from '../../context/AuthContext';
 
 import { ProjectDetailedModel } from '../../models/ProjectDetailedModel';
-
 import { ProjectDescription } from './ProjectDescription';
 import { ProjectPageModal } from './ProjectPageModal';
 
 import './Projects.scss'
-
 
 export function Projects () {
   const { state } = useAuth();
@@ -31,6 +29,8 @@ export function Projects () {
             const inProgressProjects = await fetchUserProjectsByStatus(state.user.employeeId, 'IN_PROGRESS');
             const inReviewProjects = await fetchUserProjectsByStatus(state.user.employeeId, 'IN_REVIEW');
             fetchedProjects = [...inProgressProjects, ...inReviewProjects];
+          } else if (selectedStatus === 'ALL') {
+            fetchedProjects = await fetchUserDetailedProjects(state.user.employeeId);
           } else {
             fetchedProjects = await fetchUserProjectsByStatus(state.user.employeeId, selectedStatus);
           }
@@ -114,6 +114,7 @@ export function Projects () {
             <option value='IN_REVIEW'>In Review</option>
             <option value='NOT_STARTED'>Not Started</option>
             <option value='DONE'>Done</option>
+            <option value='ALL'>All</option>
           </select>
         </div> 
 

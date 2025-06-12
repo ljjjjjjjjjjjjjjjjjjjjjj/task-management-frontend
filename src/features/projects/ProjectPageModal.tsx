@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ProjectDetailedModel } from '../../models/ProjectDetailedModel';
-import { createProject, fetchDetailedProjectById, updateProject } from '../../api/ProjectsApi';
+import { createProject, deleteProject, fetchDetailedProjectById, updateProject } from '../../api/ProjectsApi';
 import { fetchEmployeesWithImagesAll } from '../../api/EmployeesApi';
 import { format } from 'date-fns';
 import DatePicker from 'react-datepicker';
@@ -17,6 +17,7 @@ import { useDispatch } from 'react-redux';
 import { showToast } from '../../store/toastSlice';
 
 import './ProjectPageModal.scss'
+import { IconBin } from '../../components/common/icons';
 
 interface ProjectPageModalProps {
   project: ProjectDetailedModel;
@@ -34,6 +35,8 @@ export function ProjectPageModal ({ project, onClose, onProjectUpdated }: Projec
   const [newTeamId, setNewTeamId] = useState<string>('');
   const [allTeams, setAllTeams] = useState<TeamNameModel[]>([]);
   const [participantResetTrigger, setParticipantResetTrigger] = useState<boolean>(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const isUserCreator = state.user?.employeeId === formProject.createdByEmployee.employeeId;
 
   useEffect(() => {
     
@@ -126,23 +129,22 @@ export function ProjectPageModal ({ project, onClose, onProjectUpdated }: Projec
         .map(employee => employee.employeeId)
         .filter((employeeId): employeeId is string => employeeId !== undefined);
 
+
       const projectToBeUpdated: ProjectModel = {
         projectId: formProject.projectId,
         projectName: formProject.projectName,
         teamIds: projectTeamIds,
         participantIds: projectParticipantsIds,
         createdById: formProject.createdByEmployee.employeeId,
-        status: formProject.status,
+        status: formProject.status?.trim() || 'NOT_STARTED',
         progress: formProject.progress,
 
         startDate: formProject.startDate,
         initialDeadlineDate: formProject.initialDeadlineDate,
         endDate: formProject.endDate,
-      
       };
 
       console.log("projectToBeUpdated", projectToBeUpdated);
-
 
       if (!formProject.projectId && state.user) {
           const createdProject = await createProject(projectToBeUpdated);
@@ -176,6 +178,54 @@ export function ProjectPageModal ({ project, onClose, onProjectUpdated }: Projec
     }
   };
 
+  const handleDelete = () => {
+    console.log("Pressed delete button");
+    setShowDeleteConfirm(true);
+  }
+
+  const confirmDelete = async () => {
+    const userId = state.user?.employeeId;
+    const creatorId = formProject.createdByEmployee.employeeId;
+  
+    if (userId !== creatorId) {
+      dispatch(showToast({
+        status: 'warning',
+        message: 'You do not have permission to delete this project. Please contact the person who created it.',
+      }));
+      setShowDeleteConfirm(false);
+      return;
+    }
+  
+    try {
+      if (formProject.projectId) {
+        await deleteProject(formProject.projectId);
+        dispatch(showToast({
+          status: 'success',
+          message: 'Project deleted successfully.',
+        }));
+        onClose();
+      } else {
+        dispatch(showToast({
+          status: 'error',
+          message: 'No project ID found.',
+        }));
+      }
+      
+    } catch (error) {
+      console.error('Delete failed:', error);
+      dispatch(showToast({
+        status: 'error',
+        message: 'Failed to delete project.',
+      }));
+    }
+  
+    setShowDeleteConfirm(false);
+  };
+  
+  const cancelDelete = () => {
+    console.log('Cancelled');
+    setShowDeleteConfirm(false);
+  };
 
   return (
     <div className="project-modal">
@@ -267,8 +317,6 @@ export function ProjectPageModal ({ project, onClose, onProjectUpdated }: Projec
           </select>
         </div>
 
-
-
         <div className='project-form-item'>
           <label htmlFor="progress">Progress (%):</label>
           <input
@@ -280,8 +328,6 @@ export function ProjectPageModal ({ project, onClose, onProjectUpdated }: Projec
             style={{ width: '60px'}}
           />
         </div>
-        
-
 
         <div className='project-form-item'>
           <label htmlFor="progress"></label>
@@ -295,7 +341,6 @@ export function ProjectPageModal ({ project, onClose, onProjectUpdated }: Projec
             onChange={handleChange}
           />
         </div>
-
 
         {formProject.status.toLowerCase() !== 'not started' && (
           <div className='project-form-item'>
@@ -317,7 +362,6 @@ export function ProjectPageModal ({ project, onClose, onProjectUpdated }: Projec
           </div>
         )}
 
-
         {/* {formProject.status.toLowerCase() !== 'not_started' && (
           <div className='project-form-item'>
             <label htmlFor="startDate">
@@ -333,7 +377,6 @@ export function ProjectPageModal ({ project, onClose, onProjectUpdated }: Projec
             />
           </div>
         )} */}
-
 
         {formProject.status.toLowerCase() === 'done' && (
           <div className='project-form-item'>
@@ -351,7 +394,6 @@ export function ProjectPageModal ({ project, onClose, onProjectUpdated }: Projec
           </div>
         )}
 
-        
         <div className='project-form-item'>
           <label htmlFor="initialDeadlineDate">
             Deadline:
@@ -372,7 +414,6 @@ export function ProjectPageModal ({ project, onClose, onProjectUpdated }: Projec
           />
         </div>
         
-
         <div className='project-form-item'>
           <label htmlFor="createdByEmployee">
             Created by:
@@ -385,6 +426,31 @@ export function ProjectPageModal ({ project, onClose, onProjectUpdated }: Projec
           />
         </div>
 
+        <div className='project-form-item'>
+          <label></label>
+          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <button type="button" className="icon-button" onClick={handleDelete}>
+              <IconBin size={20} color="grey" />
+            </button>
+          </div>
+        </div>
+
+        {showDeleteConfirm && (
+          <div className="delete-confirmation">
+            {isUserCreator ? (
+              <>
+                <p>Are you sure you want to delete this project?</p>
+                <p>All tasks under this project will have their project reference removed.</p>
+                <div className='project-form-submit-buttons'>
+                  <button type="button" onClick={confirmDelete}>Confirm</button>
+                  <button type="button" onClick={cancelDelete}>Cancel</button>
+                </div>
+              </>
+            ) : (
+              <p>You do not have permission to delete this project. Please contact the person who created it.</p>
+            )}
+          </div>
+        )}
 
         <div className='project-form-submit-buttons'>
           <button type="submit">Save</button>

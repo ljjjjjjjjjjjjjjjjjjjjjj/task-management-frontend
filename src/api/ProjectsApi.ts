@@ -31,17 +31,11 @@ export const updateProject = async (project: ProjectModel, projectId: string): P
   return response.data;
 };
 
-
-
-
 export const createProject = async (project: ProjectModel): Promise<ProjectModel> => {
   console.log("API - createProject entered");
   const response = await axios.post<ProjectModel>(`${baseUrl}`, project);
   return response.data;
 };
-
-
-
 
 export const addParticipant = async (projectId: string, participantId: string): Promise<void> => {
   await axios.post(`${baseUrl}/${projectId}/addParticipant/${participantId}`);
@@ -49,4 +43,8 @@ export const addParticipant = async (projectId: string, participantId: string): 
 
 export const addTeam = async (projectId: string, teamId: string): Promise<void> => {
   await axios.post(`${baseUrl}/${projectId}/addTeam/${teamId}`);
+};
+
+export const deleteProject = async (projectId: string): Promise<void> => {
+  await axios.delete(`${baseUrl}/${projectId}`);
 };
